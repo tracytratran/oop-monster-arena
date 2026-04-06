@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monster Arena</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>⚔️ Monster Arena</h1>
+    <p id="bout-label">Waiting for the tournament to start...</p>
+  </header>
+
+  <main class="arena">
+    <!-- Left fighter -->
+    <div class="fighter" id="fighter-left">
+      <div class="monster-img-wrap">
+        <img class="monster-img" id="img-left" src="" alt="" />
+      </div>
+      <h2 class="monster-name" id="name-left">—</h2>
+      <div class="health-bar-wrap">
+        <div class="health-bar" id="bar-left"></div>
+      </div>
+      <span class="hp-label" id="hp-left"></span>
+    </div>
+
+    <!-- Battle log -->
+    <div class="log-wrap">
+      <ul class="log" id="log"></ul>
+    </div>
+
+    <!-- Right fighter -->
+    <div class="fighter" id="fighter-right">
+      <div class="monster-img-wrap">
+        <img class="monster-img" id="img-right" src="" alt="" />
+      </div>
+      <h2 class="monster-name" id="name-right">—</h2>
+      <div class="health-bar-wrap">
+        <div class="health-bar" id="bar-right"></div>
+      </div>
+      <span class="hp-label" id="hp-right"></span>
+    </div>
+  </main>
+
+  <!-- Leaderboard overlay -->
+  <div class="leaderboard-overlay" id="leaderboard" aria-hidden="true">
+    <div class="leaderboard-card">
+      <h2>🏆 Final Standings</h2>
+      <ol id="leaderboard-list"></ol>
+    </div>
+  </div>
+
+  <script type="module" src="index.js"></script>
+</body>
+</html>
