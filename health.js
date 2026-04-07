@@ -10,6 +10,9 @@ export class HealthComponent {
    * @param {number} maxHealth  The maximum (and starting) HP value.
    */
   constructor(maxHealth) {
+    if (typeof maxHealth !== 'number' || maxHealth < 0) {
+      throw new Error(`HealthComponent: maxHealth must be a non-negative number, got ${maxHealth}`);
+    }
     this._max     = maxHealth;  // never changes — the ceiling
     this._current = maxHealth;  // changes as damage/healing happens
   }
@@ -27,6 +30,7 @@ export class HealthComponent {
    * The arena UI uses this to set health bar widths.
    */
   get percentage() {
+    if (this._max === 0) return 0;
     return Math.round((this._current / this._max) * 100);
   }
 
@@ -41,7 +45,7 @@ export class HealthComponent {
   }
 
   /**
-   * Restore HP by `amount`. HP never exceeds _max.
+   * Restore HP by `amount`. HP never exceeds its maximum.
    * Useful for heal-based special abilities.
    * @param {number} amount
    */
@@ -54,7 +58,7 @@ export class HealthComponent {
     return this._current > 0;
   }
 
-  /** Fully restore HP to maximum. Called between tournament bouts. */
+  /** Fully restores HP to maximum — useful when a monster starts a new bout. */
   reset() {
     this._current = this._max;
   }
