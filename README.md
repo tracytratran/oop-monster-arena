@@ -14,6 +14,8 @@ A JavaScript class that extends `Monster`. Your monster has:
 
 The base `Monster` class uses a `HealthComponent` for HP management — this is an example of **composition** (has-a relationship). Your subclass is an example of **inheritance** (is-a relationship). You'll see both OOP patterns in action.
 
+**Stat budget:** your combined score — `health + attackPower × 3` — must be ≤ 200. Attack power is more expensive than raw HP (3 pts each vs 1 pt). Dragon uses 120 HP + 18 attack = 174 pts. Exceeding the budget throws an error immediately so you can fix it fast.
+
 ---
 
 ## Your workflow
@@ -27,7 +29,7 @@ Click **Fork** in the top-right corner of GitHub. This gives you your own copy t
 cp monsters/your-monster.js monsters/YourMonsterName.js
 ```
 
-Open the new file and follow the `TODO` comments step by step.
+Open the new file. Read `monsters/dragon.js` for a full worked example, then fill in your stats and write your `specialAbility()`.
 
 ### 3. Add your monster's image
 
@@ -105,7 +107,7 @@ Vite hot-reloads automatically — save `index.js` and the browser updates insta
 
 - [ ] Copied and renamed `your-monster.js`
 - [ ] Renamed the class to match the filename (case-sensitive!)
-- [ ] Called `super()` with a name, health, and attack power
+- [ ] Called `super()` with a name, health, and attack power (budget: `health + attackPower × 3 ≤ 200`)
 - [ ] Overrode `specialAbility()` with something creative
 - [ ] Added an image to `assets/monsters/` (exact class name as filename)
 - [ ] Opened a PR 🎉

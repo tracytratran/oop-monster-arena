@@ -32,16 +32,20 @@ function emit(name, detail) {
  *
  * @param {Monster} a
  * @param {Monster} b
- * @returns {{ events: object[], winner: Monster }}
+ * @returns {{ events: object[], winner: Monster|null, firstAttacker: Monster }}
  */
 function simulateBout(a, b) {
   const events = [];
   let turn = 0;
 
+  // Coin flip — who strikes first? Adds variance even between identical builds.
+  const goesFirst  = Math.random() < 0.5 ? a : b;
+  const goesSecond = goesFirst === a ? b : a;
+
   // Guard: max 200 turns to prevent infinite loops with immortal builds
   while (a.isAlive() && b.isAlive() && turn < 200) {
-    const attacker = turn % 2 === 0 ? a : b;
-    const defender = turn % 2 === 0 ? b : a;
+    const attacker = turn % 2 === 0 ? goesFirst  : goesSecond;
+    const defender = turn % 2 === 0 ? goesSecond : goesFirst;
 
     const result = attacker.attack(defender);
 
@@ -78,7 +82,7 @@ function simulateBout(a, b) {
   // else: both alive (max turns) or both dead (mutual KO) → draw, winner stays null
 
   events.push({ type: 'boutEnd', winnerName: winner ? winner.name : null, isDraw: winner === null });
-  return { events, winner };
+  return { events, winner, firstAttacker: goesFirst };
 }
 
 // ── Tournament ──
@@ -110,6 +114,9 @@ export function tournament(monsters) {
       a.reset();
       b.reset();
 
+      // Simulate first so firstAttacker is known before building the boutStart event
+      const { events, winner, firstAttacker } = simulateBout(a, b);
+
       allEvents.push({
         type: 'boutStart',
         aName: a.name,
@@ -118,9 +125,9 @@ export function tournament(monsters) {
         bImagePath: b.imagePath,
         aMaxHp: a.hp.max,
         bMaxHp: b.hp.max,
+        firstAttacker: firstAttacker.name,
       });
 
-      const { events, winner } = simulateBout(a, b);
       allEvents.push(...events);
       if (winner) wins[winner.name]++; // null on a draw — no point awarded
 

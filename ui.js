@@ -79,7 +79,8 @@ function glowCard(side) {
 // ── Event handlers ──
 
 document.addEventListener('arena:boutStart', ({ detail: d }) => {
-  boutLabel.textContent = `⚔️  ${d.aName}  vs  ${d.bName}`;
+  const strikeNote = d.firstAttacker ? ` — ${d.firstAttacker} strikes first!` : '';
+  boutLabel.textContent = `⚔️  ${d.aName}  vs  ${d.bName}${strikeNote}`;
 
   imgLeft.src   = d.aImagePath;  imgLeft.alt   = d.aName;
   imgRight.src  = d.bImagePath;  imgRight.alt  = d.bName;

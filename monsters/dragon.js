@@ -1,12 +1,10 @@
 // monsters/dragon.js
 //
-// ── REFERENCE EXAMPLE ──
-// Read this file to understand how to build your own monster.
-// Don't copy it blindly — your monster should be original!
+// ── REFERENCE EXAMPLE — read this, then write your own in monsters/your-monster.js ──
 //
 // What to notice:
 //   1. We extend Monster (INHERITANCE — Dragon IS-A Monster)
-//   2. We call super() with our chosen stats
+//   2. We call super() with our chosen stats (budget: health + attackPower * 3 ≤ 200)
 //   3. We override specialAbility() with something creative
 //   4. We return a string from specialAbility() so the arena can log it
 //   5. We override reset() and call super.reset() to also restore our resource
