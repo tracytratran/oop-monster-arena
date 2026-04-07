@@ -91,6 +91,8 @@ function simulateBout(a, b) {
  */
 export function tournament(monsters) {
   if (monsters.length < 2) {
+    const label = document.getElementById('bout-label');
+    if (label) label.textContent = '⚠️ Need at least 2 monsters to start the tournament!';
     console.error('Need at least 2 monsters for a tournament.');
     return;
   }

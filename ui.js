@@ -33,6 +33,9 @@ function barColor(pct) {
 function updateBar(side, hp, maxHp, pct) {
   const bar  = side === 'left' ? barLeft  : barRight;
   const hpEl = side === 'left' ? hpLeft   : hpRight;
+  // Kill any in-flight width tween so back-to-back updates (attack then special)
+  // start cleanly rather than interrupting mid-animation.
+  gsap.killTweensOf(bar, 'width');
   gsap.to(bar, {
     width: `${pct}%`,
     backgroundColor: barColor(pct),
@@ -52,6 +55,9 @@ function addLog(text, cls) {
 
 function shakeCard(side) {
   const card = side === 'left' ? fighterLeft : fighterRight;
+  // Kill any in-flight shake so rapid attacks don't compound the x offset.
+  gsap.killTweensOf(card, 'x');
+  gsap.set(card, { x: 0 });
   gsap.fromTo(card,
     { x: -6 },
     { x: 6, duration: 0.08, repeat: 3, yoyo: true, ease: 'none',
@@ -61,11 +67,12 @@ function shakeCard(side) {
 
 function glowCard(side) {
   const card = side === 'left' ? fighterLeft : fighterRight;
-  card.classList.add('glow');
+  // Kill any in-flight glow so overlapping specials fade cleanly.
+  gsap.killTweensOf(card, 'boxShadow');
+  // GSAP owns boxShadow entirely — no CSS class needed for the animation.
   gsap.fromTo(card,
     { boxShadow: '0 0 30px rgba(233,69,96,0.9)' },
-    { boxShadow: '0 0 0px rgba(233,69,96,0)', duration: 0.8, ease: 'power2.out',
-      onComplete: () => card.classList.remove('glow') }
+    { boxShadow: '0 0 0px rgba(233,69,96,0)', duration: 0.8, ease: 'power2.out' }
   );
 }
 
@@ -133,7 +140,7 @@ document.addEventListener('arena:tournamentEnd', ({ detail: d }) => {
   );
 });
 
-// Close button
+// Close button — fades out overlay and clears GSAP inline styles
 closeBtn.addEventListener('click', () => {
   gsap.to(leaderboard, {
     opacity: 0,
@@ -141,6 +148,8 @@ closeBtn.addEventListener('click', () => {
     onComplete: () => {
       leaderboard.classList.remove('visible');
       leaderboard.setAttribute('aria-hidden', 'true');
+      // Clear GSAP inline style so the next open animation starts from a clean state
+      gsap.set(leaderboard, { clearProps: 'opacity' });
     },
   });
 });
