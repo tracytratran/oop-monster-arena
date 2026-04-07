@@ -41,6 +41,15 @@ Open the new file. Read `monsters/dragon.js` for a full worked example, then fil
   get imagePath() { return 'assets/monsters/YourMonsterName.jpg'; }
   ```
 
+### 3b. Test your monster
+
+```bash
+npm test                       # tests monsters/your-monster.js
+npm test monsters/Hydra.js     # tests your renamed file
+```
+
+You should see 10 green checks. Fix anything red before submitting.
+
 ### 4. Open a Pull Request
 
 Push your branch and open a PR to the instructor's repo. Your monster will be imported into the arena before the tournament starts.
