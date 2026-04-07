@@ -9,13 +9,14 @@
 <body>
   <header>
     <h1>⚔️ Monster Arena</h1>
-    <p id="bout-label">Waiting for the tournament to start...</p>
+    <p id="bout-label" aria-live="polite">Waiting for the tournament to start...</p>
   </header>
 
   <main class="arena">
     <!-- Left fighter -->
     <div class="fighter" id="fighter-left">
       <div class="monster-img-wrap">
+        <!-- alt is set programmatically by ui.js when the bout starts -->
         <img class="monster-img" id="img-left" src="" alt="" />
       </div>
       <h2 class="monster-name" id="name-left">—</h2>
@@ -27,12 +28,13 @@
 
     <!-- Battle log -->
     <div class="log-wrap">
-      <ul class="log" id="log"></ul>
+      <ul class="log" id="log" aria-live="polite" aria-label="Battle log"></ul>
     </div>
 
     <!-- Right fighter -->
     <div class="fighter" id="fighter-right">
       <div class="monster-img-wrap">
+        <!-- alt is set programmatically by ui.js when the bout starts -->
         <img class="monster-img" id="img-right" src="" alt="" />
       </div>
       <h2 class="monster-name" id="name-right">—</h2>
@@ -45,8 +47,9 @@
 
   <!-- Leaderboard overlay -->
   <div class="leaderboard-overlay" id="leaderboard" aria-hidden="true">
-    <div class="leaderboard-card">
+    <div class="leaderboard-card" style="position:relative;">
       <h2>🏆 Final Standings</h2>
+      <button id="leaderboard-close" aria-label="Close leaderboard" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
       <ol id="leaderboard-list"></ol>
     </div>
   </div>
