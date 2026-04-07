@@ -14,7 +14,9 @@
 // ── Timing constants (ms) ──
 const ATTACK_DELAY   = 700;   // pause between individual attacks
 const BOUT_DELAY     = 1800;  // pause before next bout starts
-const SPECIAL_DELAY  = 400;   // extra pause when a special ability fires
+// Special ability fires 400ms BEFORE the next attack (within the attack window),
+// creating a quick dramatic follow-up rather than a full extra pause.
+const SPECIAL_DELAY  = 400;   // gap from special to next event (< ATTACK_DELAY = feels snappy)
 
 // ── Event helpers ──
 
@@ -69,8 +71,13 @@ function simulateBout(a, b) {
     turn++;
   }
 
-  const winner = a.isAlive() ? a : b;
-  events.push({ type: 'boutEnd', winnerName: winner.name });
+  // Determine winner — handle draws (max turns or mutual KO on same attack)
+  let winner = null;
+  if (a.isAlive() && !b.isAlive()) winner = a;
+  else if (b.isAlive() && !a.isAlive()) winner = b;
+  // else: both alive (max turns) or both dead (mutual KO) → draw, winner stays null
+
+  events.push({ type: 'boutEnd', winnerName: winner ? winner.name : null, isDraw: winner === null });
   return { events, winner };
 }
 
@@ -113,7 +120,7 @@ export function tournament(monsters) {
 
       const { events, winner } = simulateBout(a, b);
       allEvents.push(...events);
-      wins[winner.name]++;
+      if (winner) wins[winner.name]++; // null on a draw — no point awarded
 
       allEvents.push({ type: 'boutPause' }); // breathing room between bouts
     }
@@ -125,6 +132,10 @@ export function tournament(monsters) {
     .sort((a, b) => b.wins - a.wins);
 
   allEvents.push({ type: 'tournamentEnd', leaderboard });
+
+  // Restore all monsters to full HP after simulation — leaves caller objects clean
+  // Note: student specials that mutate attackPower must reset it in their own reset()
+  monsters.forEach(m => m.reset());
 
   // ── Phase 2: play back events with delays ──
   playback(allEvents);
