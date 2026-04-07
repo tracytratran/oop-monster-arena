@@ -54,7 +54,7 @@ export class Monster {
   attack(opponent) {
     opponent.takeDamage(this.attackPower);
     const usedSpecial = this.specialAbility(opponent);
-    return { damage: this.attackPower, special: usedSpecial };
+    return { damage: this.attackPower, special: !!usedSpecial };
   }
 
   /**
@@ -81,8 +81,9 @@ export class Monster {
 
   /**
    * Path to this monster's image.
-   * Convention: place your image in assets/monsters/ and name it
-   * exactly after your class (e.g. Dragon.png, Hydra.jpg).
+   * Convention: place a .png in assets/monsters/ named exactly after your class
+   * (e.g. Dragon.png, Hydra.png). If you use a different format (.jpg, .svg, .webp),
+   * override this getter in your subclass to return the correct path.
    */
   get imagePath() {
     return `assets/monsters/${this.constructor.name}.png`;
