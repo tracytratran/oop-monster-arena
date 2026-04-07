@@ -9,6 +9,7 @@
 //   2. We call super() with our chosen stats
 //   3. We override specialAbility() with something creative
 //   4. We return a string from specialAbility() so the arena can log it
+//   5. We override reset() and call super.reset() to also restore our resource
 
 import { Monster } from '../monster.js';
 
@@ -44,11 +45,14 @@ export class Dragon extends Monster {
   // If your special ability has a resource (like fireCharges),
   // override reset() and call super.reset() to also reset your resource.
   reset() {
-    super.reset(); // always call this first — resets HP via HealthComponent
+    super.reset(); // always call super.reset() first — it resets HP via HealthComponent.
+                   // Calling super first is a good habit: if the parent ever depends on
+                   // state being fresh, you want it to run before your own overrides.
     this.fireCharges = 3;
   }
 
-  // Dragon uses an SVG image — override imagePath to point to it.
+  // The base Monster class assumes .png — override imagePath when your image
+  // uses a different format (Dragon uses an SVG here).
   get imagePath() {
     return 'assets/monsters/Dragon.svg';
   }
