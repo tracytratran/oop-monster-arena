@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Dragon">
+  <!-- Tail (drawn first so body overlaps it) -->
+  <path d="M 65,155 Q 30,175 45,195 Q 55,175 75,165 Z" fill="#922b21"/>
   <!-- Dragon body -->
   <ellipse cx="100" cy="130" rx="55" ry="35" fill="#c0392b"/>
   <!-- Dragon neck -->
@@ -18,8 +20,6 @@
   <!-- Right wing -->
   <polygon points="145,110 190,55 155,125" fill="#922b21"/>
   <polygon points="145,110 190,55 170,60 150,105" fill="#e74c3c" opacity="0.6"/>
-  <!-- Tail -->
-  <path d="M 55,145 Q 30,170 50,185 Q 40,165 65,158" fill="#c0392b"/>
   <!-- Belly scales -->
   <ellipse cx="100" cy="135" rx="35" ry="22" fill="#e74c3c" opacity="0.5"/>
   <!-- Fire breath -->
@@ -32,6 +32,6 @@
   <line x1="115" y1="165" x2="120" y2="178" stroke="#922b21" stroke-width="3" stroke-linecap="round"/>
   <line x1="125" y1="163" x2="132" y2="175" stroke="#922b21" stroke-width="3" stroke-linecap="round"/>
   <!-- Horns -->
-  <polygon points="90,42 86,22 94,40" fill="#7d3c98"/>
-  <polygon points="106,40 108,20 112,39" fill="#7d3c98"/>
+  <polygon points="88,42 82,18 96,40" fill="#7d3c98"/>
+  <polygon points="106,40 110,16 116,39" fill="#7d3c98"/>
 </svg>

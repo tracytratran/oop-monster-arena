@@ -32,9 +32,12 @@ Open the new file and follow the `TODO` comments step by step.
 ### 3. Add your monster's image
 
 - Find or generate an image for your monster (Google Images, DALL·E, Midjourney…)
-- Save it as `assets/monsters/YourMonsterName.png`
 - The filename **must exactly match your class name** (case-sensitive!)
-- If you use a non-PNG format (.jpg, .svg, .webp), override `get imagePath()` in your class
+- If your image is a **PNG**: save it as `assets/monsters/YourMonsterName.png` — done!
+- If your image is a **JPG or other format**: save it with the right extension, then add this to your class:
+  ```js
+  get imagePath() { return 'assets/monsters/YourMonsterName.jpg'; }
+  ```
 
 ### 4. Open a Pull Request
 
@@ -50,7 +53,9 @@ Push your branch and open a PR to the instructor's repo. Your monster will be im
 | Override `specialAbility(opponent)` | Your monster's unique power |
 | `opponent.takeDamage(amount)` | Deal bonus damage to opponent |
 | `this.hp.heal(amount)` | Restore your own HP |
-| `opponent.attackPower -= 5` | Weaken the opponent permanently |
+| `opponent.attackPower -= 5` | Weaken the opponent (don't go below 1!) |
+| `this.health` | Read your current HP |
+| `this.name` | Your monster's name (use it in log strings) |
 | Return a string | Arena logs it during the fight |
 | Return `null` | Ability didn't trigger this turn |
 
@@ -79,10 +84,12 @@ npm run dev
 Open the URL shown in the terminal. As student PRs are merged, add each group's import to `index.js`:
 
 ```js
-// index.js — add one line per group:
+// index.js — two steps per group:
+// Step 1: add an import at the top (filename must match class name exactly)
 import { Hydra }    from './monsters/Hydra.js';
 import { Werewolf } from './monsters/Werewolf.js';
 
+// Step 2: add a new instance to the array
 const monsters = [
   new Dragon(),
   new Hydra(),
