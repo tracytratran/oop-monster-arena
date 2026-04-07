@@ -49,12 +49,14 @@ export class Monster {
    * 2. Then triggers our special ability (if any).
    *
    * @param {Monster} opponent  The monster being attacked.
-   * @returns {{ damage: number, special: boolean }}
+   * @returns {{ damage: number, special: string|null }}
    */
   attack(opponent) {
     opponent.takeDamage(this.attackPower);
     const usedSpecial = this.specialAbility(opponent);
-    return { damage: this.attackPower, special: !!usedSpecial };
+    // Return the string from specialAbility (or null). The arena uses it as
+    // the log message — a truthy string means the ability fired this turn.
+    return { damage: this.attackPower, special: usedSpecial };
   }
 
   /**
