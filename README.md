@@ -1,6 +1,6 @@
 # Monster Arena ⚔️
 
-Each team builds a custom monster. At the end of the session, **all monsters fight in a round-robin tournament** — every monster vs every other monster, once. The arena animates each battle in real time in the browser.
+Each team builds a custom monster. At the end of the session, **all monsters fight in a round-robin tournament** — every monster vs every other monster, once. The arena animates each battle in real time in the browser, with a live results matrix and a 1 000-simulation Monte Carlo win-rate chart.
 
 ---
 
@@ -12,7 +12,7 @@ A JavaScript class that extends `Monster`. Your monster has:
 
 The base `Monster` class uses a `HealthComponent` for HP management — this is an example of **composition** (has-a relationship). Your subclass is an example of **inheritance** (is-a relationship). You'll see both OOP patterns in action.
 
-**Stat budget:** your combined score — `health + attackPower × 3` — must be ≤ 200. Attack power is more expensive than raw HP (3 pts each vs 1 pt). Dragon uses 120 HP + 18 attack = 174 pts. Exceeding the budget throws an error immediately so you can fix it fast.
+**Stat budget:** your combined score — `health + attackPower × 3` — must be ≤ 300. Attack power is more expensive than raw HP (3 pts each vs 1 pt). Dragon uses 160 HP + 30 attack × 3 = 250 pts. Exceeding the budget throws an error immediately so you can fix it fast.
 
 ---
 
@@ -27,7 +27,7 @@ Click **Fork** in the top-right corner of GitHub. This gives you your own copy t
 cp src/monsters/your-monster.js src/monsters/YourMonsterName.js
 ```
 
-Open the new file. Read `monsters/dragon.js` for a full worked example, then fill in your stats and pick an ability to inject.
+Open the new file. Read `src/monsters/Dragon.js` for a full worked example, then fill in your stats and pick an ability to inject.
 
 ### 3. Add your monster's image
 
@@ -39,16 +39,16 @@ Open the new file. Read `monsters/dragon.js` for a full worked example, then fil
   get imagePath() { return 'assets/monsters/YourMonsterName.jpg'; }
   ```
 
-### 3b. Test your monster
+### 4. Test your monster
 
 ```bash
 npm test                              # tests src/monsters/your-monster.js
-npm test src/monsters/Hydra.js        # tests your renamed file
+npm test src/monsters/YourMonsterName.js  # tests your renamed file
 ```
 
-You should see 10 green checks. Fix anything red before submitting.
+You should see green checks for all tests. Fix anything red before submitting.
 
-### 4. Open a Pull Request
+### 5. Open a Pull Request
 
 Push your branch and open a PR to the instructor's repo. Your monster will be imported into the arena before the tournament starts.
 
@@ -61,14 +61,14 @@ Two classes in one file — an ability and a monster:
 ```js
 // Your ability — extends one of the three base types
 class MyAbility extends DamageAbility {
-  activate(attacker, opponent) { /* your logic */ }
-  computeTriggerChance(attacker, opponent) { /* optional — dynamic chance */ }
+  activate(attacker, opponent) { /* return damage amount */ }
+  describe(attacker, amount)   { /* return a log string */ }
 }
 
 // Your monster — extends Monster, injects your ability
 export class YourMonster extends Monster {
-  constructor() { super('Name', health, attack, new MyAbility(amount)); }
-  onTakeDamage(amount) { /* optional — react when hit */ }
+  constructor() { super('Name', health, attackPower, new MyAbility(amount)); }
+  onTakeDamage(amount) { /* optional — react when hit, swap stats or ability */ }
 }
 ```
 
@@ -80,7 +80,7 @@ export class YourMonster extends Monster {
 
 ## Ability base types
 
-Extend one and override `activate()`. `triggerChance` re-computes every turn as `budget / amount`.
+Extend one and override `activate()`. `triggerChance` is derived automatically as `budget / amount` — you never set it directly.
 
 | Base type | Budget | Default effect |
 |---|---|---|
@@ -88,9 +88,9 @@ Extend one and override `activate()`. `triggerChance` re-computes every turn as 
 | `HealAbility` | 12 | `attacker.hp.heal(this.amount)` |
 | `ArmorAbility` | 8 | `opponent.attackPower -= this.amount` |
 
-Override `computeTriggerChance(attacker, opponent)` to vary the chance per turn. It is always capped at `budget / amount` — the budget always holds.
+Example: `new MyAbility(30)` extends `DamageAbility` → triggerChance = 15/30 = 50%.
 
-Example: `new MyAbility(30)` extends `DamageAbility` → base triggerChance = 50%.
+See `ABILITY_EXAMPLES.md` for full examples including the charge system.
 
 ---
 
@@ -101,10 +101,10 @@ Example: `new MyAbility(30)` extends `DamageAbility` → base triggerChance = 50
 | `src/core/health.js` | ✅ Yes — see how **composition** works | ❌ No |
 | `src/core/monster.js` | ✅ Yes — understand the base class | ❌ No |
 | `src/core/ability.js` | ✅ Yes — see the three ability types | ❌ No |
-| `src/monsters/dragon.js` | ✅ Yes — your **reference example** | ❌ No |
+| `src/monsters/Dragon.js` | ✅ Yes — your **reference example** | ❌ No |
 | `src/monsters/your-monster.js` | ✅ Yes | ✅ **This is your file** |
-| `arena.js` | Optional | ❌ No |
-| `ui.js` | Optional | ❌ No |
+| `src/arena.js` | Optional | ❌ No |
+| `src/ui.js` | Optional | ❌ No |
 
 ---
 
@@ -115,12 +115,12 @@ npm install
 npm run dev
 ```
 
-Open the URL shown in the terminal. As student PRs are merged, add each group's import to `index.js`:
+Open the URL shown in the terminal. As student PRs are merged, add each group's import to `src/main.js`:
 
 ```js
-// index.js — two steps per group:
-// Step 1: add an import at the top (filename must match class name exactly)
-import { Hydra }    from './monsters/Hydra.js';    // pattern: src/monsters/ClassName.js
+// src/main.js — two steps per group:
+// Step 1: add an import at the top
+import { Hydra }    from './monsters/Hydra.js';
 import { Werewolf } from './monsters/Werewolf.js';
 
 // Step 2: add a new instance to the array
@@ -131,7 +131,7 @@ const monsters = [
 ];
 ```
 
-Vite hot-reloads automatically — save `index.js` and the browser updates instantly.
+Vite hot-reloads automatically — save `main.js` and the browser updates instantly.
 
 ---
 
@@ -139,7 +139,8 @@ Vite hot-reloads automatically — save `index.js` and the browser updates insta
 
 - [ ] Copied and renamed `your-monster.js`
 - [ ] Renamed the class to match the filename (case-sensitive!)
-- [ ] Called `super()` with name, health, attack power, and an ability (budget: `health + attackPower × 3 ≤ 200`)
+- [ ] Called `super()` with name, health, attack power, and an ability (budget: `health + attackPower × 3 ≤ 300`)
 - [ ] Passed a `DamageAbility`, `HealAbility`, or `ArmorAbility` as the 4th argument
 - [ ] Added an image to `assets/monsters/` (exact class name as filename)
+- [ ] Ran `npm test` — all checks pass
 - [ ] Opened a PR 🎉
