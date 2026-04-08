@@ -13,7 +13,7 @@ import { Troll } from './monsters/Troll.js';
 
 // ── ──────────────────────────────────────────── ──
 
-import { tournament } from './arena.js';
+import { tournament, cancelTournament, monteCarlo } from './arena.js';
 import './ui.js';         // registers all DOM event listeners
 import './style.css';
 
@@ -26,4 +26,17 @@ const monsters = [
   // new Hydra(),   ← example of what to add
 ];
 
-tournament(monsters);
+// Populate the start screen roster, then run Monte Carlo in the background.
+document.dispatchEvent(new CustomEvent('arena:roster', {
+  detail: monsters.map(m => m.name),
+}));
+
+setTimeout(() => {
+  const results = monteCarlo(monsters, 1000);
+  document.dispatchEvent(new CustomEvent('arena:montecarlo', { detail: results }));
+}, 0);
+
+window.startTournament = () => {
+  cancelTournament();
+  tournament(monsters);
+};

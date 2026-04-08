@@ -12,6 +12,7 @@
   <header>
     <h1>⚔️ Monster Arena</h1>
     <p id="bout-label" aria-live="polite">Waiting for the tournament to start...</p>
+    <button id="header-restart-btn" aria-label="Restart tournament" hidden>Restart</button>
   </header>
 
   <main class="arena">
@@ -60,6 +61,21 @@
       <h2>Final Standings</h2>
       <button id="leaderboard-close" aria-label="Close leaderboard" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
       <ol id="leaderboard-list"></ol>
+      <div id="montecarlo-panel">
+        <p id="montecarlo-label"></p>
+        <ul id="montecarlo-list"></ul>
+      </div>
+      <button id="restart-btn">Play Again</button>
+    </div>
+  </div>
+
+  <!-- Start screen -->
+  <div id="start-screen" aria-modal="true" role="dialog" aria-label="Monster Arena start screen">
+    <div id="start-card">
+      <p id="start-subtitle">Round Robin Tournament</p>
+      <h2 id="start-title">Monster<br>Arena</h2>
+      <ul id="start-roster"></ul>
+      <button id="start-btn">Press Start</button>
     </div>
   </div>
 

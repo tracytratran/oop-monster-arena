@@ -17,6 +17,9 @@ const lbList = document.getElementById('leaderboard-list');
 const fighterLeft = document.getElementById('fighter-left');
 const fighterRight = document.getElementById('fighter-right');
 const closeBtn = document.getElementById('leaderboard-close');
+const headerRestartBtn = document.getElementById('header-restart-btn');
+const startScreen = document.getElementById('start-screen');
+const startRoster = document.getElementById('start-roster');
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const prevHp = { left: null, right: null };
@@ -216,21 +219,98 @@ document.addEventListener('arena:tournamentEnd', ({ detail: d }) => {
     lbList.appendChild(li);
   });
 
+  populateMonteCarlo();
+
   leaderboard.classList.add('visible');
   leaderboard.setAttribute('aria-hidden', 'false');
   gsap.fromTo(leaderboard, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power2.out' });
   gsap.fromTo('.leaderboard-card', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, delay: 0.2, ease: 'back.out(1.4)' });
+  headerRestartBtn.hidden = false;
 });
 
-closeBtn.addEventListener('click', () => {
+function closeLeaderboard() {
   gsap.to(leaderboard, {
     opacity: 0,
     duration: 0.3,
     onComplete: () => {
       leaderboard.classList.remove('visible');
       leaderboard.setAttribute('aria-hidden', 'true');
-      // Clear GSAP inline styles so the next open animation starts clean.
       gsap.set(leaderboard, { clearProps: 'opacity' });
     },
   });
+}
+
+closeBtn.addEventListener('click', closeLeaderboard);
+
+function resetUI() {
+  log.innerHTML = '';
+  boutLabel.textContent = 'Waiting for the tournament to start...';
+  fighterLeft.classList.remove('low-hp');
+  fighterRight.classList.remove('low-hp');
+  prevHp.left = null;
+  prevHp.right = null;
+  headerRestartBtn.hidden = true;
+}
+
+function doRestart() {
+  closeLeaderboard();
+  resetUI();
+  window.startTournament();
+}
+
+document.getElementById('restart-btn').addEventListener('click', doRestart);
+headerRestartBtn.addEventListener('click', doRestart);
+
+// ── Start screen ──
+document.getElementById('start-btn').addEventListener('click', () => {
+  if (prefersReducedMotion) {
+    startScreen.hidden = true;
+  } else {
+    gsap.to(startScreen, {
+      opacity: 0, duration: 0.4, ease: 'power2.in',
+      onComplete: () => { startScreen.hidden = true; },
+    });
+  }
+  window.startTournament();
 });
+
+document.addEventListener('arena:roster', ({ detail: names }) => {
+  startRoster.innerHTML = '';
+  names.forEach(name => {
+    const li = document.createElement('li');
+    li.textContent = name;
+    startRoster.appendChild(li);
+  });
+});
+
+let _mcResults = null;
+
+document.addEventListener('arena:montecarlo', ({ detail: results }) => {
+  _mcResults = results;
+});
+
+function populateMonteCarlo() {
+  if (!_mcResults) return;
+  const list  = document.getElementById('montecarlo-list');
+  const label = document.getElementById('montecarlo-label');
+  label.textContent = '1 000 sim win rate';
+  list.innerHTML = '';
+
+  _mcResults.forEach(({ name, winRate }, i) => {
+    const pct = Math.round(winRate * 100);
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="mc-name-row">
+        <span class="mc-name">${name}</span>
+        <span class="mc-pct">${pct}%</span>
+      </div>
+      <div class="mc-bar-track">
+        <div class="mc-bar-fill rank-${i + 1}" style="width:0%"></div>
+      </div>`;
+    list.appendChild(li);
+
+    requestAnimationFrame(() => {
+      li.querySelector('.mc-bar-fill').style.width = `${pct}%`;
+    });
+  });
+}

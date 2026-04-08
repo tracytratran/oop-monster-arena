@@ -4,12 +4,80 @@
 //   1. Simulate all bouts instantly (deterministic, no async)
 //   2. Play back the event log with delays (async, drives the UI)
 
-const ATTACK_DELAY = 700;
+const ATTACK_DELAY = 1500;
 const BOUT_DELAY = 1800;
-const SPECIAL_DELAY = 400;
+const SPECIAL_DELAY = 300;
 
 function emit(name, detail) {
   document.dispatchEvent(new CustomEvent(`arena:${name}`, { detail }));
+}
+
+/**
+ * Run a Monte Carlo simulation over many tournaments and return win-rate stats.
+ * Uses a lightweight simulation that skips event building for speed.
+ *
+ * @param {Monster[]} monsters
+ * @param {number} [iterations=1000]
+ * @returns {{ name: string, winRate: number, avgWins: number }[]}
+ *   Sorted by winRate descending. winRate = fraction of tournaments won (0–1).
+ *   avgWins = average bout wins per tournament.
+ */
+export function monteCarlo(monsters, iterations = 1000) {
+  const names = monsters.map(m => m.name);
+  const tournamentWins = Object.fromEntries(names.map(n => [n, 0]));
+  const boutWinTotals  = Object.fromEntries(names.map(n => [n, 0]));
+  const boutsPerTournament = (monsters.length * (monsters.length - 1)) / 2;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const wins = Object.fromEntries(names.map(n => [n, 0]));
+
+    for (let i = 0; i < monsters.length; i++) {
+      for (let j = i + 1; j < monsters.length; j++) {
+        const a = monsters[i];
+        const b = monsters[j];
+        a.reset();
+        b.reset();
+        const winner = _simulateBoutFast(a, b);
+        if (winner) wins[winner.name]++;
+      }
+    }
+
+    monsters.forEach(m => m.reset());
+
+    // Credit tournament win to whoever had the most bout wins.
+    const maxWins = Math.max(...Object.values(wins));
+    const champions = names.filter(n => wins[n] === maxWins);
+    // Distribute credit evenly among tied champions.
+    champions.forEach(n => { tournamentWins[n] += 1 / champions.length; });
+    names.forEach(n => { boutWinTotals[n] += wins[n]; });
+  }
+
+  return names
+    .map(name => ({
+      name,
+      winRate:  tournamentWins[name] / iterations,
+      avgWins:  boutWinTotals[name]  / iterations,
+      maxWins:  boutsPerTournament,
+    }))
+    .sort((a, b) => b.winRate - a.winRate);
+}
+
+/** Lightweight bout simulation — no event recording, just returns the winner. */
+function _simulateBoutFast(a, b) {
+  const goesFirst  = Math.random() < 0.5 ? a : b;
+  const goesSecond = goesFirst === a ? b : a;
+  let turn = 0;
+
+  while (a.isAlive() && b.isAlive() && turn < 200) {
+    const attacker = turn % 2 === 0 ? goesFirst : goesSecond;
+    const defender = turn % 2 === 0 ? goesSecond : goesFirst;
+    attacker.attack(defender);
+    turn++;
+  }
+
+  if (a.isAlive() && !b.isAlive()) return a;
+  if (b.isAlive() && !a.isAlive()) return b;
+  return null; // draw
 }
 
 function simulateBout(a, b) {
@@ -21,23 +89,36 @@ function simulateBout(a, b) {
   const goesSecond = goesFirst === a ? b : a;
 
   // 200-turn cap prevents infinite loops with immortal builds.
-  while (a.isAlive() && b.isAlive() && turn < 200) {
+ while (a.isAlive() && b.isAlive() && turn < 200) {
     const attacker = turn % 2 === 0 ? goesFirst : goesSecond;
     const defender = turn % 2 === 0 ? goesSecond : goesFirst;
+
+    // Snapshot HP before the attack so the attack event reflects only normal
+    // damage, and the special event reflects only the special's contribution.
+    const defenderHpBefore = defender.hp.current;
+
     const result = attacker.attack(defender);
+
+    // HP after just the normal attack (before the special was applied).
+    // attack() applies both atomically, so we reconstruct the mid-point:
+    // normal damage is clamped at 0 by HealthComponent, mirror that here.
+    const defenderHpAfterAttack = Math.max(0, defenderHpBefore - result.damage);
+    const defenderPctAfterAttack = Math.round((defenderHpAfterAttack / defender.hp.max) * 100);
 
     events.push({
       type: 'attack',
       attackerName: attacker.name,
       defenderName: defender.name,
       damage: result.damage,
-      defenderHp: defender.hp.current,
+      defenderHp: defenderHpAfterAttack,
       defenderMaxHp: defender.hp.max,
-      defenderPct: defender.hp.percentage,
+      defenderPct: defenderPctAfterAttack,
       attackerSide: attacker === a ? 'left' : 'right',
     });
 
     if (result.special) {
+      // defender.hp.current now reflects attack + special; attacker.hp.current
+      // reflects any self-heal from the special.
       events.push({
         type: 'special',
         attackerName: attacker.name,
@@ -118,32 +199,40 @@ export function tournament(monsters) {
   playback(allEvents);
 }
 
+let _pendingTimeouts = [];
+
+export function cancelTournament() {
+  _pendingTimeouts.forEach(clearTimeout);
+  _pendingTimeouts = [];
+}
+
 function playback(events) {
+  _pendingTimeouts = [];
   let delay = 0;
 
   for (const event of events) {
     switch (event.type) {
       case 'boutStart':
-        setTimeout(() => emit('boutStart', event), delay);
+        _pendingTimeouts.push(setTimeout(() => emit('boutStart', event), delay));
         delay += BOUT_DELAY;
         break;
       case 'attack':
-        setTimeout(() => emit('attack', event), delay);
+        _pendingTimeouts.push(setTimeout(() => emit('attack', event), delay));
         delay += ATTACK_DELAY;
         break;
       case 'special':
-        setTimeout(() => emit('special', event), delay);
+        _pendingTimeouts.push(setTimeout(() => emit('special', event), delay));
         delay += SPECIAL_DELAY;
         break;
       case 'boutEnd':
-        setTimeout(() => emit('boutEnd', event), delay);
+        _pendingTimeouts.push(setTimeout(() => emit('boutEnd', event), delay));
         delay += BOUT_DELAY;
         break;
       case 'boutPause':
         delay += BOUT_DELAY;
         break;
       case 'tournamentEnd':
-        setTimeout(() => emit('tournamentEnd', event), delay);
+        _pendingTimeouts.push(setTimeout(() => emit('tournamentEnd', event), delay));
         break;
     }
   }
