@@ -3,8 +3,8 @@
 // Quick sanity-check for your monster class.
 //
 // Usage:
-//   npm test                  ← tests monsters/your-monster.js
-//   npm test monsters/Hydra.js  ← tests your renamed file
+//   npm test                          ← tests src/monsters/your-monster.js
+//   npm test src/monsters/Hydra.js    ← tests your renamed file
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -12,7 +12,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ── Which file to test? ──
-const target = process.argv[2] ?? 'monsters/your-monster.js';
+const target = process.argv[2] ?? 'src/monsters/your-monster.js';
 const filePath = path.resolve(__dirname, target);
 
 // ── Output helpers ──
@@ -61,7 +61,10 @@ try {
   monster = new MonsterClass();
   ok(`new ${MonsterClass.name}() constructs without error`);
   const score = monster.hp.max + monster.attackPower * 3;
-  ok(`Stat budget: ${monster.hp.max} HP + ${monster.attackPower} atk × 3 = ${score}/200`);
+  const abilityNote = monster.ability
+    ? ` | ability: ${monster.ability.constructor.name}(${monster.ability.amount}), triggerChance: ${(monster.ability.triggerChance * 100).toFixed(0)}%`
+    : ' | no ability';
+  ok(`Stat budget: ${monster.hp.max} HP + ${monster.attackPower} atk × 3 = ${score}/300${abilityNote}`);
 } catch (err) {
   fail(`Constructor throws an error`, err.message);
   console.log(`\n${red('Fix the error above before testing further.')}`);
@@ -101,20 +104,28 @@ try {
   fail(`attack() threw an error`, err.message);
 }
 
-// ── specialAbility() return type ──
+// ── ability shape ──
 monster.reset(); dummy.reset();
-try {
-  const result = monster.specialAbility(dummy);
-  if (result === null || typeof result === 'string') {
-    ok(`specialAbility() returns ${result === null ? 'null' : `a string: "${result}"`}`);
+if (monster.ability === null) {
+  ok(`ability is null (no ability injected)`);
+} else {
+  const { Ability } = await import(path.resolve(__dirname, 'src/core/ability.js'));
+  if (monster.ability instanceof Ability) {
+    const chance = (monster.ability.triggerChance * 100).toFixed(0);
+    ok(`ability is a ${monster.ability.constructor.name} instance (triggerChance: ${chance}%)`);
   } else {
-    fail(
-      `specialAbility() must return a string or null`,
-      `got ${typeof result}: ${JSON.stringify(result)}`
-    );
+    fail(`ability must be a DamageAbility, HealAbility, or ArmorAbility`, `got: ${monster.ability}`);
   }
-} catch (err) {
-  fail(`specialAbility() threw an error`, err.message);
+  try {
+    const result = monster.ability.tryActivate(monster, dummy);
+    if (result === null || typeof result === 'string') {
+      ok(`ability.tryActivate() returns ${result === null ? 'null (did not trigger this roll)' : `a string`}`);
+    } else {
+      fail(`ability.tryActivate() must return a string or null`, `got: ${JSON.stringify(result)}`);
+    }
+  } catch (err) {
+    fail(`ability.tryActivate() threw an error`, err.message);
+  }
 }
 
 // ── reset() restores HP ──

@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <title>Monster Arena</title>
-  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
@@ -13,6 +15,13 @@
   </header>
 
   <main class="arena">
+    <div id="vs-overlay" aria-hidden="true">
+      <div id="vs-content">
+        <span id="vs-name-left"></span>
+        <span id="vs-text">VS</span>
+        <span id="vs-name-right"></span>
+      </div>
+    </div>
     <!-- Left fighter -->
     <div class="fighter" id="fighter-left">
       <div class="monster-img-wrap">
@@ -48,12 +57,12 @@
   <!-- Leaderboard overlay -->
   <div class="leaderboard-overlay" id="leaderboard" aria-hidden="true">
     <div class="leaderboard-card" style="position:relative;">
-      <h2>🏆 Final Standings</h2>
+      <h2>Final Standings</h2>
       <button id="leaderboard-close" aria-label="Close leaderboard" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
       <ol id="leaderboard-list"></ol>
     </div>
   </div>
 
-  <script type="module" src="index.js"></script>
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
