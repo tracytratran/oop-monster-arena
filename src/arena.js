@@ -4,7 +4,7 @@
 //   1. Simulate all bouts instantly (deterministic, no async)
 //   2. Play back the event log with delays (async, drives the UI)
 
-const ATTACK_DELAY = 1500;
+const ATTACK_DELAY = 400;
 const BOUT_DELAY = 1800;
 const SPECIAL_DELAY = 300;
 
@@ -23,13 +23,13 @@ function emit(name, detail) {
  *   avgWins = average bout wins per tournament.
  */
 export function monteCarlo(monsters, iterations = 1000) {
-  const names = monsters.map(m => m.name);
-  const tournamentWins = Object.fromEntries(names.map(n => [n, 0]));
-  const boutWinTotals  = Object.fromEntries(names.map(n => [n, 0]));
+  const ids = monsters.map(m => m.id);
+  const tournamentWins = Object.fromEntries(ids.map(id => [id, 0]));
+  const boutWinTotals  = Object.fromEntries(ids.map(id => [id, 0]));
   const boutsPerTournament = (monsters.length * (monsters.length - 1)) / 2;
 
   for (let iter = 0; iter < iterations; iter++) {
-    const wins = Object.fromEntries(names.map(n => [n, 0]));
+    const wins = Object.fromEntries(ids.map(id => [id, 0]));
 
     for (let i = 0; i < monsters.length; i++) {
       for (let j = i + 1; j < monsters.length; j++) {
@@ -38,7 +38,7 @@ export function monteCarlo(monsters, iterations = 1000) {
         a.reset();
         b.reset();
         const winner = _simulateBoutFast(a, b);
-        if (winner) wins[winner.name]++;
+        if (winner) wins[winner.id]++;
       }
     }
 
@@ -46,17 +46,17 @@ export function monteCarlo(monsters, iterations = 1000) {
 
     // Credit tournament win to whoever had the most bout wins.
     const maxWins = Math.max(...Object.values(wins));
-    const champions = names.filter(n => wins[n] === maxWins);
+    const champIds = ids.filter(id => wins[id] === maxWins);
     // Distribute credit evenly among tied champions.
-    champions.forEach(n => { tournamentWins[n] += 1 / champions.length; });
-    names.forEach(n => { boutWinTotals[n] += wins[n]; });
+    champIds.forEach(id => { tournamentWins[id] += 1 / champIds.length; });
+    ids.forEach(id => { boutWinTotals[id] += wins[id]; });
   }
 
-  return names
-    .map(name => ({
-      name,
-      winRate:  tournamentWins[name] / iterations,
-      avgWins:  boutWinTotals[name]  / iterations,
+  return monsters
+    .map(m => ({
+      name:     m.name,
+      winRate:  tournamentWins[m.id] / iterations,
+      avgWins:  boutWinTotals[m.id]  / iterations,
       maxWins:  boutsPerTournament,
     }))
     .sort((a, b) => b.winRate - a.winRate);
@@ -140,7 +140,7 @@ function simulateBout(a, b) {
   if (a.isAlive() && !b.isAlive()) winner = a;
   else if (b.isAlive() && !a.isAlive()) winner = b;
 
-  events.push({ type: 'boutEnd', winnerName: winner ? winner.name : null, isDraw: winner === null });
+  events.push({ type: 'boutEnd', winnerId: winner ? winner.id : null, winnerName: winner ? winner.name : null, isDraw: winner === null });
   return { events, winner, firstAttacker: goesFirst };
 }
 
@@ -157,7 +157,7 @@ export function tournament(monsters) {
   }
 
   const allEvents = [];
-  const wins = Object.fromEntries(monsters.map((m) => [m.name, 0]));
+  const wins = Object.fromEntries(monsters.map((m) => [m.id, 0]));
 
   for (let i = 0; i < monsters.length; i++) {
     for (let j = i + 1; j < monsters.length; j++) {
@@ -172,6 +172,8 @@ export function tournament(monsters) {
 
       allEvents.push({
         type: 'boutStart',
+        aId: a.id,
+        bId: b.id,
         aName: a.name,
         bName: b.name,
         aImagePath: a.imagePath,
@@ -182,14 +184,14 @@ export function tournament(monsters) {
       });
 
       allEvents.push(...events);
-      if (winner) wins[winner.name]++;
+      if (winner) wins[winner.id]++;
 
       allEvents.push({ type: 'boutPause' });
     }
   }
 
-  const leaderboard = Object.entries(wins)
-    .map(([name, w]) => ({ name, wins: w }))
+  const leaderboard = monsters
+    .map(m => ({ name: m.name, wins: wins[m.id] }))
     .sort((a, b) => b.wins - a.wins);
 
   allEvents.push({ type: 'tournamentEnd', leaderboard });

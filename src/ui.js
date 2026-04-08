@@ -20,9 +20,62 @@ const closeBtn = document.getElementById('leaderboard-close');
 const headerRestartBtn = document.getElementById('header-restart-btn');
 const startScreen = document.getElementById('start-screen');
 const startRoster = document.getElementById('start-roster');
+const rrTable = document.getElementById('rr-table');
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const prevHp = { left: null, right: null };
+
+let _rrMonsters = []; // [{ id, name }]
+let _rrActivePair = null;
+
+function buildRRTable() {
+  rrTable.innerHTML = '';
+  const thead = rrTable.createTHead();
+  const headRow = thead.insertRow();
+  headRow.insertCell();
+  _rrMonsters.forEach(({ id, name }) => {
+    const th = document.createElement('th');
+    th.textContent = name;
+    th.dataset.colId = id;
+    headRow.appendChild(th);
+  });
+  const tbody = rrTable.createTBody();
+  _rrMonsters.forEach(({ id: rowId, name: rowName }) => {
+    const tr = tbody.insertRow();
+    const th = document.createElement('th');
+    th.textContent = rowName;
+    th.dataset.rowId = rowId;
+    tr.appendChild(th);
+    _rrMonsters.forEach(({ id: colId }) => {
+      const td = tr.insertCell();
+      td.dataset.rowId = rowId;
+      td.dataset.colId = colId;
+      if (rowId === colId) {
+        td.className = 'rr-self';
+        td.textContent = '—';
+      }
+    });
+  });
+}
+
+function updateRRCell(rowId, colId, state) {
+  const td = rrTable.querySelector(`td[data-row-id="${rowId}"][data-col-id="${colId}"]`);
+  if (!td || td.classList.contains('rr-self')) return;
+  td.className = `rr-${state}`;
+  td.textContent = state === 'active' ? '···'
+                 : state === 'win'    ? 'W'
+                 : state === 'loss'   ? 'L'
+                 :                      'D';
+}
+
+function setRRHeaderActive(aId, bId, active) {
+  rrTable.querySelectorAll('th').forEach(th => {
+    if (th.dataset.rowId === aId || th.dataset.rowId === bId ||
+        th.dataset.colId === aId || th.dataset.colId === bId) {
+      th.classList.toggle('rr-active', active);
+    }
+  });
+}
 
 function barColor(pct) {
   if (pct > 60) return '#39ff14';
@@ -115,14 +168,29 @@ function vsFlash(aName, bName) {
 }
 
 function victoryPulse(winnerSide) {
-  if (prefersReducedMotion || !winnerSide) return;
-  const card  = winnerSide === 'left' ? fighterLeft : fighterRight;
-  const color = winnerSide === 'left' ? '0,255,255' : '255,0,255';
-  gsap.killTweensOf(card, 'scale,boxShadow');
-  gsap.timeline()
-    .to(card, { scale: 1.04, boxShadow: `0 0 30px rgba(${color},0.9)`, duration: 0.3, ease: 'power2.out' })
-    .to(card, { scale: 1.02, boxShadow: `0 0 15px rgba(${color},0.5)`, duration: 0.3, yoyo: true, repeat: 2 })
-    .to(card, { scale: 1,    boxShadow: `0 0 10px rgba(${color},0.2)`, duration: 0.3, clearProps: 'scale' });
+  if (!winnerSide) return;
+  const winCard  = winnerSide === 'left' ? fighterLeft  : fighterRight;
+  const loseCard = winnerSide === 'left' ? fighterRight : fighterLeft;
+  const color    = winnerSide === 'left' ? '0,255,255'  : '255,0,255';
+
+  loseCard.classList.add('bout-loser');
+
+  if (!prefersReducedMotion) {
+    gsap.killTweensOf(winCard, 'scale,boxShadow');
+    gsap.timeline()
+      .to(winCard, { scale: 1.06, boxShadow: `0 0 40px rgba(${color},1)`, duration: 0.25, ease: 'power2.out' })
+      .to(winCard, { scale: 1.03, boxShadow: `0 0 20px rgba(${color},0.6)`, duration: 0.25, yoyo: true, repeat: 3 })
+      .to(winCard, { scale: 1,    boxShadow: `0 0 10px rgba(${color},0.2)`, duration: 0.3, clearProps: 'scale' });
+  }
+
+  const badge = document.createElement('div');
+  badge.className = 'bout-result-badge winner';
+  badge.textContent = 'WINNER!';
+  badge.setAttribute('aria-hidden', 'true');
+  winCard.appendChild(badge);
+  if (!prefersReducedMotion) {
+    gsap.fromTo(badge, { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: 'back.out(2)' });
+  }
 }
 
 function shakeArena() {
@@ -154,8 +222,10 @@ document.addEventListener('arena:boutStart', ({ detail: d }) => {
   nameLeft.textContent = d.aName;
   nameRight.textContent = d.bName;
 
-  fighterLeft.classList.remove('low-hp');
-  fighterRight.classList.remove('low-hp');
+  fighterLeft.classList.remove('low-hp', 'bout-loser');
+  fighterRight.classList.remove('low-hp', 'bout-loser');
+  fighterLeft.querySelectorAll('.bout-result-badge').forEach(el => el.remove());
+  fighterRight.querySelectorAll('.bout-result-badge').forEach(el => el.remove());
   prevHp.left  = d.aMaxHp;
   prevHp.right = d.bMaxHp;
 
@@ -171,6 +241,12 @@ document.addEventListener('arena:boutStart', ({ detail: d }) => {
     gsap.fromTo(fighterLeft,  { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: 'power2.out' });
     gsap.fromTo(fighterRight, { x:  40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: 'power2.out' });
   }
+
+  if (_rrActivePair) setRRHeaderActive(_rrActivePair.a, _rrActivePair.b, false);
+  _rrActivePair = { a: d.aId, b: d.bId };
+  updateRRCell(d.aId, d.bId, 'active');
+  updateRRCell(d.bId, d.aId, 'active');
+  setRRHeaderActive(d.aId, d.bId, true);
 });
 
 document.addEventListener('arena:attack', ({ detail: d }) => {
@@ -203,14 +279,34 @@ document.addEventListener('arena:boutEnd', ({ detail: d }) => {
     addLog('Draw! No points awarded.', 'bout');
   } else {
     addLog(`${d.winnerName} wins the bout!`, 'bout');
-    const winnerSide = nameLeft.textContent === d.winnerName  ? 'left'
-                     : nameRight.textContent === d.winnerName ? 'right'
+    const winnerSide = _rrActivePair && d.winnerId === _rrActivePair.a ? 'left'
+                     : _rrActivePair && d.winnerId === _rrActivePair.b ? 'right'
                      : null;
     victoryPulse(winnerSide);
+  }
+
+  if (_rrActivePair) {
+    const { a, b } = _rrActivePair;
+    setRRHeaderActive(a, b, false);
+    if (d.isDraw) {
+      updateRRCell(a, b, 'draw');
+      updateRRCell(b, a, 'draw');
+    } else {
+      const winnerId = d.winnerId;
+      const loserId  = winnerId === a ? b : a;
+      updateRRCell(winnerId, loserId, 'win');
+      updateRRCell(loserId, winnerId, 'loss');
+    }
+    _rrActivePair = null;
   }
 });
 
 document.addEventListener('arena:tournamentEnd', ({ detail: d }) => {
+  if (_rrActivePair) {
+    setRRHeaderActive(_rrActivePair.a, _rrActivePair.b, false);
+    _rrActivePair = null;
+  }
+
   lbList.innerHTML = '';
   d.leaderboard.forEach(({ name, wins }, i) => {
     const li = document.createElement('li');
@@ -245,11 +341,16 @@ closeBtn.addEventListener('click', closeLeaderboard);
 function resetUI() {
   log.innerHTML = '';
   boutLabel.textContent = 'Waiting for the tournament to start...';
-  fighterLeft.classList.remove('low-hp');
-  fighterRight.classList.remove('low-hp');
+  fighterLeft.classList.remove('low-hp', 'bout-loser');
+  fighterRight.classList.remove('low-hp', 'bout-loser');
+  fighterLeft.querySelectorAll('.bout-result-badge').forEach(el => el.remove());
+  fighterRight.querySelectorAll('.bout-result-badge').forEach(el => el.remove());
   prevHp.left = null;
   prevHp.right = null;
   headerRestartBtn.hidden = true;
+  _rrMonsters = [];
+  _rrActivePair = null;
+  // Table rebuilds on next arena:roster event
 }
 
 function doRestart() {
@@ -274,13 +375,16 @@ document.getElementById('start-btn').addEventListener('click', () => {
   window.startTournament();
 });
 
-document.addEventListener('arena:roster', ({ detail: names }) => {
+document.addEventListener('arena:roster', ({ detail: monsters }) => {
   startRoster.innerHTML = '';
-  names.forEach(name => {
+  monsters.forEach(({ name }) => {
     const li = document.createElement('li');
     li.textContent = name;
     startRoster.appendChild(li);
   });
+  _rrMonsters = monsters; // [{ id, name }]
+  _rrActivePair = null;
+  buildRRTable();
 });
 
 let _mcResults = null;

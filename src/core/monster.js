@@ -52,6 +52,7 @@ import { HealthComponent } from './health.js';
 import { Ability } from './ability.js';
 
 export class Monster {
+  static _nextId = 0;
   /**
    * @param {string} name         Display name shown in the arena UI.
    * @param {number} health       Starting HP. Must be ≥ 10.
@@ -84,6 +85,7 @@ export class Monster {
         `[Monster] "${name}": ability must be a DamageAbility, HealAbility, or ArmorAbility instance`
       );
 
+    this.id = `monster-${Monster._nextId++}`;
     this.name = name;
     this.attackPower = attackPower;
     this._initialAttackPower = attackPower;

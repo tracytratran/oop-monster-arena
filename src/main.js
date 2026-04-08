@@ -28,7 +28,7 @@ const monsters = [
 
 // Populate the start screen roster, then run Monte Carlo in the background.
 document.dispatchEvent(new CustomEvent('arena:roster', {
-  detail: monsters.map(m => m.name),
+  detail: monsters.map(m => ({ id: m.id, name: m.name })),
 }));
 
 setTimeout(() => {

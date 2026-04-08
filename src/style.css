@@ -463,6 +463,91 @@ body::after {
   50%       { opacity: 0; }
 }
 
+/* ── Bout result overlays ── */
+.bout-result-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-pixel);
+  font-size: 0.9rem;
+  letter-spacing: 3px;
+  pointer-events: none;
+  z-index: 10;
+  text-align: center;
+  white-space: nowrap;
+}
+.bout-result-badge.winner {
+  color: #fff;
+  text-shadow: 0 0 10px currentColor, 0 0 30px currentColor, 2px 2px 0 rgba(0,0,0,0.8);
+}
+#fighter-left  .bout-result-badge.winner { color: var(--neon-left); }
+#fighter-right .bout-result-badge.winner { color: var(--neon-right); }
+.fighter.bout-loser {
+  opacity: 0.35;
+  filter: grayscale(80%);
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+/* ── Round Robin Matrix ── */
+#round-robin {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(0,255,255,0.1);
+}
+#rr-title {
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  color: var(--muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+#rr-table-wrap {
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+}
+#rr-table {
+  border-collapse: separate;
+  border-spacing: 4px;
+}
+#rr-table th {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--muted);
+  letter-spacing: 1px;
+  padding: 0.4rem 0.6rem;
+  text-align: center;
+  white-space: nowrap;
+}
+#rr-table th.rr-active { color: var(--cyan); }
+#rr-table td {
+  width: 54px;
+  height: 40px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 3px;
+  text-align: center;
+  vertical-align: middle;
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  letter-spacing: 1px;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+}
+#rr-table td.rr-self {
+  background: rgba(255,255,255,0.02);
+  color: rgba(255,255,255,0.15);
+}
+#rr-table td.rr-win  { background: rgba(57,255,20,0.12);  color: var(--green);  border-color: rgba(57,255,20,0.3); }
+#rr-table td.rr-loss { background: rgba(255,32,32,0.10);  color: var(--red);    border-color: rgba(255,32,32,0.3); }
+#rr-table td.rr-draw { background: rgba(255,215,0,0.10);  color: var(--yellow); border-color: rgba(255,215,0,0.3); }
+@keyframes rr-active-pulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(0,255,255,0.3); border-color: rgba(0,255,255,0.4); }
+  50%       { box-shadow: 0 0 14px rgba(0,255,255,0.8); border-color: rgba(0,255,255,0.9); }
+}
+#rr-table td.rr-active { animation: rr-active-pulse 0.9s ease-in-out infinite; }
+
 /* ── Responsive ── */
 @media (max-width: 860px) {
   .arena { grid-template-columns: 1fr; }
@@ -474,4 +559,5 @@ body::after {
   body::after { display: none; }
   .fighter.low-hp { animation: none; }
   #start-btn { animation: none; }
+  #rr-table td.rr-active { animation: none; border-color: var(--cyan); }
 }
