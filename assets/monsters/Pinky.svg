@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1248" height="1248" viewBox="0 0 1248 1248" role="img" aria-labelledby="title desc">
+  <title id="title">Original cute pink monster illustration</title>
+  <desc id="desc">A cheerful round pink monster with orange horns, big eyes, small arms, feet, teeth, and fluffy details.</desc>
+
+  <defs>
+    <radialGradient id="bodyGrad" cx="48%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#ffd6e8"/>
+      <stop offset="45%" stop-color="#f49ac2"/>
+      <stop offset="100%" stop-color="#d85a9b"/>
+    </radialGradient>
+
+    <linearGradient id="furGrad" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffb3d1"/>
+      <stop offset="100%" stop-color="#c9468c"/>
+    </linearGradient>
+
+    <linearGradient id="hornGrad" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffd166"/>
+      <stop offset="100%" stop-color="#ff7a59"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#7a2b58" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <rect width="1248" height="1248" fill="transparent"/>
+
+  <ellipse cx="624" cy="1148" rx="390" ry="42" fill="#8f4b73" opacity="0.16"/>
+
+  <!-- horns -->
+  <path d="M342 277 C330 178 375 102 432 66 C420 170 461 220 489 283 Z" fill="url(#hornGrad)" stroke="#b94862" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M759 283 C787 220 828 170 816 66 C873 102 918 178 906 277 Z" fill="url(#hornGrad)" stroke="#b94862" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M371 197 C404 205 431 225 455 251" fill="none" stroke="#f06a4e" stroke-width="10" opacity="0.7"/>
+  <path d="M392 139 C426 150 453 176 472 213" fill="none" stroke="#f06a4e" stroke-width="10" opacity="0.55"/>
+  <path d="M877 197 C844 205 817 225 793 251" fill="none" stroke="#f06a4e" stroke-width="10" opacity="0.7"/>
+  <path d="M856 139 C822 150 795 176 776 213" fill="none" stroke="#f06a4e" stroke-width="10" opacity="0.55"/>
+
+  <!-- ears -->
+  <path d="M288 339 C203 300 161 325 206 384 C244 431 301 414 348 390 Z" fill="#f7a9cb" stroke="#b74786" stroke-width="6"/>
+  <path d="M960 339 C1045 300 1087 325 1042 384 C1004 431 947 414 900 390 Z" fill="#f7a9cb" stroke="#b74786" stroke-width="6"/>
+
+  <!-- arms -->
+  <path d="M250 631 C176 705 144 831 160 900 C173 957 244 955 277 891 C305 835 305 738 328 667 Z" fill="url(#furGrad)" filter="url(#softShadow)"/>
+  <path d="M998 631 C1072 705 1104 831 1088 900 C1075 957 1004 955 971 891 C943 835 943 738 920 667 Z" fill="url(#furGrad)" filter="url(#softShadow)"/>
+
+  <!-- body -->
+  <path d="M226 623
+           C226 366 395 245 624 245
+           C853 245 1022 366 1022 623
+           C1022 890 878 1059 624 1059
+           C370 1059 226 890 226 623 Z"
+        fill="url(#bodyGrad)" filter="url(#softShadow)"/>
+
+  <!-- fur spikes outline -->
+  <path d="M270 597 L220 566 L276 548 L222 502 L294 507 L251 444 L334 474 L313 398 L386 445 L394 361 L456 428 L493 349 L536 431 L590 353 L621 442 L682 353 L713 431 L756 349 L793 428 L855 361 L863 445 L936 398 L914 474 L997 444 L954 507 L1026 502 L972 548 L1028 566 L978 597"
+        fill="none" stroke="#c64f92" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+
+  <!-- hair tufts -->
+  <path d="M468 249 C508 164 543 244 572 154 C598 247 642 151 664 247 C707 167 739 247 768 199 C759 264 714 297 652 298 C574 299 516 290 468 249 Z"
+        fill="#e85fa2" stroke="#b74786" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- belly patch -->
+  <path d="M418 732
+           C438 887 505 983 624 986
+           C743 983 810 887 830 732
+           C770 787 708 815 624 814
+           C540 815 478 787 418 732 Z"
+        fill="#ffc4dc" opacity="0.78"/>
+  <path d="M472 792 C489 841 520 858 551 803 C577 877 622 879 647 803 C679 879 723 854 740 795"
+        fill="none" stroke="#bf4b8b" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+  <path d="M620 943 C594 918 632 892 653 918 C674 945 632 970 620 943 Z"
+        fill="none" stroke="#bf4b8b" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- eyes -->
+  <circle cx="506" cy="447" r="95" fill="#fffdf7" stroke="#823b72" stroke-width="10"/>
+  <circle cx="742" cy="447" r="95" fill="#fffdf7" stroke="#823b72" stroke-width="10"/>
+  <circle cx="535" cy="460" r="42" fill="#36132d"/>
+  <circle cx="713" cy="460" r="42" fill="#36132d"/>
+  <circle cx="560" cy="433" r="15" fill="#ffffff"/>
+  <circle cx="738" cy="433" r="15" fill="#ffffff"/>
+  <ellipse cx="503" cy="293" rx="44" ry="25" fill="#6c2a62" transform="rotate(-17 503 293)"/>
+  <ellipse cx="745" cy="293" rx="44" ry="25" fill="#6c2a62" transform="rotate(17 745 293)"/>
+
+  <!-- face -->
+  <ellipse cx="624" cy="540" rx="43" ry="23" fill="#ff6b81"/>
+  <ellipse cx="624" cy="532" rx="22" ry="7" fill="#ff9cab" opacity="0.8"/>
+
+  <path d="M383 568
+           C451 673 562 701 682 689
+           C763 681 835 649 884 580
+           C902 687 802 770 624 772
+           C446 770 354 674 383 568 Z"
+        fill="#4a163d"/>
+  <path d="M412 587 C496 656 736 663 853 593" fill="none" stroke="#7c315e" stroke-width="7" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- teeth -->
+  <path d="M423 593 C441 604 470 617 500 624 C494 673 461 688 435 650 C421 630 417 611 423 593 Z" fill="#fffdf7"/>
+  <path d="M549 668 C579 675 614 677 645 674 C635 733 588 738 563 696 C557 686 552 677 549 668 Z" fill="#fffdf7"/>
+  <path d="M719 661 C750 653 779 642 805 625 C816 673 787 701 753 682 C736 673 726 668 719 661 Z" fill="#fffdf7"/>
+
+  <!-- tongue -->
+  <path d="M501 718 C536 680 593 683 614 753 C573 758 535 747 501 718 Z" fill="#ff725e" opacity="0.9"/>
+  <path d="M674 753 C692 681 752 676 790 718 C759 747 719 759 674 753 Z" fill="#ff725e" opacity="0.9"/>
+
+  <!-- feet -->
+  <path d="M383 1050 C414 997 494 1006 522 1055 C537 1082 503 1110 438 1110 C382 1110 361 1087 383 1050 Z" fill="#ff8a4c"/>
+  <path d="M726 1055 C754 1006 834 997 865 1050 C887 1087 866 1110 810 1110 C745 1110 711 1082 726 1055 Z" fill="#ff8a4c"/>
+  <path d="M420 1061 C431 1028 461 1020 476 1062" fill="none" stroke="#df6f3d" stroke-width="6" stroke-linecap="round" opacity="0.45"/>
+  <path d="M773 1062 C788 1020 818 1028 829 1061" fill="none" stroke="#df6f3d" stroke-width="6" stroke-linecap="round" opacity="0.45"/>
+
+  <!-- hands/claws -->
+  <path d="M166 895 C147 909 129 930 139 943 C154 961 181 934 191 911 Z" fill="#ff8a4c"/>
+  <path d="M202 910 C187 934 184 962 204 967 C225 972 237 939 232 915 Z" fill="#ff8a4c"/>
+  <path d="M1082 895 C1101 909 1119 930 1109 943 C1094 961 1067 934 1057 911 Z" fill="#ff8a4c"/>
+  <path d="M1046 910 C1061 934 1064 962 1044 967 C1023 972 1011 939 1016 915 Z" fill="#ff8a4c"/>
+
+  <!-- freckles / fur marks -->
+  <g fill="none" stroke="#fff0f7" stroke-width="8" stroke-linecap="round" opacity="0.7">
+    <path d="M287 723 l-9 24"/>
+    <path d="M316 770 l-8 20"/>
+    <path d="M928 722 l10 24"/>
+    <path d="M960 770 l8 20"/>
+    <path d="M336 470 l-22 10"/>
+    <path d="M351 494 l-20 15"/>
+    <path d="M900 470 l22 10"/>
+    <path d="M885 494 l20 15"/>
+    <path d="M329 890 l-6 19"/>
+    <path d="M352 914 l-4 18"/>
+    <path d="M919 890 l6 19"/>
+    <path d="M896 914 l4 18"/>
+  </g>
+
+  <!-- small cheek lines -->
+  <g stroke="#ff6f9e" stroke-width="5" stroke-linecap="round" opacity="0.7">
+    <path d="M370 497 l-30 18"/>
+    <path d="M374 522 l-27 23"/>
+    <path d="M878 497 l30 18"/>
+    <path d="M874 522 l27 23"/>
+  </g>
+</svg>
